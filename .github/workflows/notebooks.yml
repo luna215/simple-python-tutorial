@@ -25,10 +25,13 @@ jobs:
           python-version: "3.12"
 
       - name: Install JupyterLite
-        run: pip install jupyterlite-core jupyterlite-pyodide-kernel jupyter-server
+        run: pip install jupyterlite-core jupyterlite-pyodide-kernel jupyter-server markdown
 
       - name: Build the site
         run: jupyter lite build --contents content --output-dir _site
+
+      - name: Render README.md as the landing page
+        run: python build_landing.py
 
       - uses: actions/upload-pages-artifact@v3
         with:
