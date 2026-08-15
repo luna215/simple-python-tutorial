@@ -8,9 +8,22 @@ JupyterLite's file browser.
 
 JupyterLite's own root page is kept at /tree.html. Nothing else is touched —
 the notebooks still live at /lab/index.html?path=...
+
+IMPORTANT — why the config script gets copied across
+----------------------------------------------------
+JupyterLite fetches the *root* index.html at runtime and reads its
+`<script id="jupyter-config-data">` element to find the site config
+(see getPageConfig in config-utils.js). If that element is missing, every
+notebook page dies with:
+
+    TypeError: Cannot read properties of null (reading 'textContent')
+
+...and renders a blank white page. So the landing page must carry that element
+through verbatim, even though it looks like dead markup. Do not remove it.
 """
 
 import os
+import re
 import sys
 
 try:
@@ -31,6 +44,10 @@ TEMPLATE = """<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
+<!-- Required by JupyterLite: notebook pages fetch this file and read the
+     element below to find the site config. Removing it makes every notebook
+     render a blank page. -->
+{config_script}
 <style>
   :root {{
     --bg: #f4f5f9;
@@ -90,17 +107,6 @@ TEMPLATE = """<!doctype html>
   }}
   blockquote p {{ margin: 0; }}
   hr {{ border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }}
-  /* a lone bold link on its own line becomes the call-to-action button */
-  p > strong:only-child > a:only-child {{
-    display: inline-block;
-    background: var(--accent);
-    color: var(--accent-ink);
-    padding: 0.7rem 1.4rem;
-    border-radius: 7px;
-    text-decoration: none;
-    font-weight: 650;
-  }}
-  p > strong:only-child > a:only-child:hover {{ filter: brightness(1.08); }}
   a:focus-visible {{ outline: 2px solid var(--accent); outline-offset: 3px; }}
 </style>
 </head>
@@ -127,14 +133,31 @@ def main():
 
     index = os.path.join(SITE, "index.html")
     kept = os.path.join(SITE, "tree.html")
+
+    # Lift JupyterLite's config element out of its own root page before we
+    # replace it. Without this every notebook renders blank — see the note
+    # at the top of this file.
+    source = kept if os.path.exists(kept) else index
+    original = open(source, encoding="utf-8").read()
+    match = re.search(
+        r'<script id="jupyter-config-data".*?</script>', original, re.S)
+    if not match:
+        raise SystemExit(
+            "\nCouldn't find <script id=\"jupyter-config-data\"> in %s.\n"
+            "Without it the notebooks would render blank pages, so refusing\n"
+            "to write a landing page.\n" % source)
+    config_script = match.group(0)
+
     if os.path.exists(index) and not os.path.exists(kept):
         os.rename(index, kept)          # keep JupyterLite's own root page
 
     with open(index, "w", encoding="utf-8") as f:
-        f.write(TEMPLATE.format(title=TITLE, body=body))
+        f.write(TEMPLATE.format(title=TITLE, body=body,
+                                config_script=config_script))
 
     print("landing page written to %s" % index)
     print("JupyterLite's original root kept at %s" % kept)
+    print("carried over: %s" % config_script.split(">")[0][:70] + ">")
 
 
 if __name__ == "__main__":
