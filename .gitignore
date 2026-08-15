@@ -1,0 +1,16 @@
+# Virtual environment — rebuilt from the README, never committed
+venv/
+
+# JupyterLite build output — the Action rebuilds this from content/
+_site/
+.jupyterlite.doit.db
+
+# Local only: needs the sprite packs, which live outside this repo
+game.py
+
+# Python
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
