@@ -118,36 +118,57 @@ TEMPLATE = """<!doctype html>
 </head>
 <body>
 <main>
-<canvas id="pochita" width="204" height="144" role="img"
-        aria-label="Pixel art of Pochita, the chainsaw dog, blinking"></canvas>
+<canvas id="pochita" width="180" height="144" role="img"
+        aria-label="Pixel art of Pochita, the chainsaw dog, wagging his tail"></canvas>
 {body}
 </main>
 <script>
-// 8-bit Pochita. Two frames, drawn pixel by pixel — no image files.
+// 8-bit Pochita, drawn pixel by pixel. No image files, no requests.
+// Four frames: tail down / tail up, each with the eye open or shut.
 (function () {{
   var PAL = {{
-    'o': '#3e261a', 'O': '#e8823a', 'L': '#f7ac6a', 'D': '#c6622a',
-    'K': '#282226', 'G': '#989aa0', 'W': '#f0f2f6', 'E': '#161212', 'N': '#fafafc'
+    'o': '#141414', 'O': '#f28234', 'D': '#d64a24',
+    'G': '#8c8c8c', 'W': '#e4e4e4', 'N': '#ffffff', 'E': '#141414'
   }};
   var A = [
-    '..................................', '..................................', '..................................',
-    '....................oooo..........', '..o................oKKKKo.ooooooo.', '.ooooo............oKKKKKKooKKKKKo.',
-    '.ooGoooo.........oKKK..KKKooooooo.', 'ooGGGGGoooo.....oKK......KKooo....', 'ooGWWGGGGoooooooooooo....KKooo....',
-    '.ooGGWWWGGGoooOOOOOOOooo.KKooo....', '..ooGGGGWWGoooLLLLOOOOOOooKooo....', '...ooGGGGGGoooLLLLLLOOOOOOoooo....',
-    '...oooooooooooLLLLLLLLOOOOOooo....', '...oOLLLLoooLLLLLLLLLLOOOOOOoo....', '..oOOOOLooNooLLLLLLLOOOOOOOOOo....',
-    '..oOOOOOoNENoLLLLLOOOOOOOOOOOo....', '...oOOOOooNooOOOOOOOOOOOOOOOo.....', '...ooOOOOoooDDDDDDDDDDOOOOOoo.....',
-    '....ooODDDDDDDDDDDDDDDDDDDoo......', '......oDDDDDDDDDDDDDDDDDDD........', '......oDooooDoDDDDDoDooooDo.......',
-    '......oDo..oDoooooooDo..oDo.......', '......ooo..ooo.....ooo..ooo.......', '..................................'
+    '..............................', '........ooo...................', '.......oGGGo....oooo..........',
+    '......oGWWGGo..o....oo........', '.....oGWWWWGGo.o......o.......', '.....oGWWWGGGGo.o.....o.......',
+    '......oGGGGGGGo.o....oo.......', '.......ooooOOOOooOOOOo........', '......oOOOOOOOOOOOOOOo........',
+    '.....oOOOOOOOONNNOOOOOo.......', '.....oODOOOOOEENNOOOOOo.......', '.....oODDOOOOEENNOOOOOo.......',
+    '....oOOOOOOOOONNOOOOOOooo.....', '....oOOOOOOOOOOOOOOOOOo..oo...', '....oOODDOOOOODOOOOOOo....oo..',
+    '....oODDDOOOODDOOOOOOo........', '....oODDDOOOODDOOOOOo.........', '....oOODDOOOOOOOOOOo..........',
+    '....ooOOOOOOOOOOOOo...........', '...oo.oOOOOOOOOOOo............', '......ooooOOOOoooo............',
+    '.........oo.oooo.oo...........', '.........oo..oo..oo...........', '..............................'
   ];
   var B = [
-    '..................................', '..................................', '..................................',
-    '..................................', '....................oooo..........', '..o................oKKKKo.ooooooo.',
-    '.ooooo............oKKKKKKooKKKKKo.', '.ooGoooo.........oKKK..KKKooooooo.', 'ooGGGGGoooo.....oKK......KKooo....',
-    'ooGWWGGGGoooooooooooo....KKooo....', '.ooGGWWWGGGoooOOOOOOOooo.KKooo....', '..ooGGGGWWGoooLLLLOOOOOOooKooo....',
-    '...ooGGGGGGoooLLLLLLOOOOOOoooo....', '...oooooooooooLLLLLLLLOOOOOooo....', '...oOLLLLLLLLLLLLLLLLLOOOOOOoo....',
-    '..oOOOOLLLLLLLLLLLLLOOOOOOOOOo....', '..oOOOOOooooLLLLLLOOOOOOOOOOOo....', '...oOOOOOOOOOOOOOOOOOOOOOOOOo.....',
-    '...ooOOOOOODDDDDDDDDDDOOOOOoo.....', '....ooODDDDDDDDDDDDDDDDDDDoo......', '......oDDDDDDDDDDDDDDDDDDD........',
-    '......oDooooDoDDDDDoDooooDo.......', '......oDo..oDoooooooDo..oDo.......', '......ooo..ooo.....ooo..ooo.......'
+    '..............................', '........ooo...................', '.......oGGGo....oooo..........',
+    '......oGWWGGo..o....oo........', '.....oGWWWWGGo.o......o.......', '.....oGWWWGGGGo.o.....o.......',
+    '......oGGGGGGGo.o....oo.......', '.......ooooOOOOooOOOOo........', '......oOOOOOOOOOOOOOOo....oo..',
+    '.....oOOOOOOOONNNOOOOOo..oo...', '.....oODOOOOOEENNOOOOOo.oo....', '.....oODDOOOOEENNOOOOOoo......',
+    '....oOOOOOOOOONNOOOOOOo.......', '....oOOOOOOOOOOOOOOOOOo.......', '....oOODDOOOOODOOOOOOo........',
+    '....oODDDOOOODDOOOOOOo........', '....oODDDOOOODDOOOOOo.........', '....oOODDOOOOOOOOOOo..........',
+    '....ooOOOOOOOOOOOOo...........', '...oo.oOOOOOOOOOOo............', '......ooooOOOOoooo............',
+    '.........oo.oooo.oo...........', '.........oo..oo..oo...........', '..............................'
+  ];
+  var C = [
+    '..............................', '........ooo...................', '.......oGGGo....oooo..........',
+    '......oGWWGGo..o....oo........', '.....oGWWWWGGo.o......o.......', '.....oGWWWGGGGo.o.....o.......',
+    '......oGGGGGGGo.o....oo.......', '.......ooooOOOOooOOOOo........', '......oOOOOOOOOOOOOOOo........',
+    '.....oOOOOOOOOOOOOOOOOo.......', '.....oODOOOOOOOOOOOOOOo.......', '.....oODDOOOOooooOOOOOo.......',
+    '....oOOOOOOOOOOOOOOOOOooo.....', '....oOOOOOOOOOOOOOOOOOo..oo...', '....oOODDOOOOODOOOOOOo....oo..',
+    '....oODDDOOOODDOOOOOOo........', '....oODDDOOOODDOOOOOo.........', '....oOODDOOOOOOOOOOo..........',
+    '....ooOOOOOOOOOOOOo...........', '...oo.oOOOOOOOOOOo............', '......ooooOOOOoooo............',
+    '.........oo.oooo.oo...........', '.........oo..oo..oo...........', '..............................'
+  ];
+  var D = [
+    '..............................', '........ooo...................', '.......oGGGo....oooo..........',
+    '......oGWWGGo..o....oo........', '.....oGWWWWGGo.o......o.......', '.....oGWWWGGGGo.o.....o.......',
+    '......oGGGGGGGo.o....oo.......', '.......ooooOOOOooOOOOo........', '......oOOOOOOOOOOOOOOo....oo..',
+    '.....oOOOOOOOOOOOOOOOOo..oo...', '.....oODOOOOOOOOOOOOOOo.oo....', '.....oODDOOOOooooOOOOOoo......',
+    '....oOOOOOOOOOOOOOOOOOo.......', '....oOOOOOOOOOOOOOOOOOo.......', '....oOODDOOOOODOOOOOOo........',
+    '....oODDDOOOODDOOOOOOo........', '....oODDDOOOODDOOOOOo.........', '....oOODDOOOOOOOOOOo..........',
+    '....ooOOOOOOOOOOOOo...........', '...oo.oOOOOOOOOOOo............', '......ooooOOOOoooo............',
+    '.........oo.oooo.oo...........', '.........oo..oo..oo...........', '..............................'
   ];
 
   var canvas = document.getElementById('pochita');
@@ -171,14 +192,14 @@ TEMPLATE = """<!doctype html>
   var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
   if (still && still.matches) return;
 
-  // Mostly sitting there, with the occasional bob and blink.
-  var timeline = [[A, 1400], [B, 180], [A, 900], [B, 180], [A, 2200], [B, 160]];
-  var i = 0;
+  // Wag the tail constantly; blink every fourth second or so.
+  var tick = 0;
   (function step() {{
-    var frame = timeline[i % timeline.length];
-    draw(frame[0]);
-    i++;
-    setTimeout(step, frame[1]);
+    var wagUp = (tick % 2 === 1);
+    var blink = (tick % 15 === 14);   // 15 is odd, so blinks alternate tail pose
+    draw(blink ? (wagUp ? D : C) : (wagUp ? B : A));
+    tick++;
+    setTimeout(step, blink ? 120 : 250);
   }})();
 }})();
 </script>
