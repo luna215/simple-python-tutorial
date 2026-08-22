@@ -44,6 +44,7 @@ TEMPLATE = """<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%23e8823a'/%3E%3Crect x='3' y='6' width='9' height='3' fill='%23989aa0'/%3E%3C/svg%3E">
 <!-- Required by JupyterLite: notebook pages fetch this file and read the
      element below to find the site config. Removing it makes every notebook
      render a blank page. -->
@@ -117,34 +118,42 @@ TEMPLATE = """<!doctype html>
 </head>
 <body>
 <main>
-<canvas id="pochita" width="112" height="112" role="img"
-        aria-label="Pixel art of Pochita, blinking"></canvas>
+<canvas id="pochita" width="204" height="144" role="img"
+        aria-label="Pixel art of Pochita, the chainsaw dog, blinking"></canvas>
 {body}
 </main>
 <script>
 // 8-bit Pochita. Two frames, drawn pixel by pixel — no image files.
 (function () {{
   var PAL = {{
-    'o': '#3a1a14', 'O': '#e27c34', 'L': '#f6ac64',
-    'K': '#1a100e', 'W': '#fcf6ec', 'G': '#9ea0aa', 'R': '#783c28'
+    'o': '#3e261a', 'O': '#e8823a', 'L': '#f7ac6a', 'D': '#c6622a',
+    'K': '#282226', 'G': '#989aa0', 'W': '#f0f2f6', 'E': '#161212', 'N': '#fafafc'
   }};
   var A = [
-    '................', '.....oooooo.....', '.....oGGGGo.....', '......oRRo......',
-    '....oooooooo....', '...oLLLLLLLLo...', '..oOLLLLLLLLOo..', '..oOKOLLLLOKOo..',
-    '..oOOLLLLLLOOo..', '..oOOOOOOOOOOo..', '..oWoWoWoWoWWo..', '..oOOOOOOOOOOo..',
-    '...oOOOOOOOOo...', '....oooooooo....', '.....o....o.....', '................'
+    '..................................', '..................................', '..................................',
+    '....................oooo..........', '..o................oKKKKo.ooooooo.', '.ooooo............oKKKKKKooKKKKKo.',
+    '.ooGoooo.........oKKK..KKKooooooo.', 'ooGGGGGoooo.....oKK......KKooo....', 'ooGWWGGGGoooooooooooo....KKooo....',
+    '.ooGGWWWGGGoooOOOOOOOooo.KKooo....', '..ooGGGGWWGoooLLLLOOOOOOooKooo....', '...ooGGGGGGoooLLLLLLOOOOOOoooo....',
+    '...oooooooooooLLLLLLLLOOOOOooo....', '...oOLLLLoooLLLLLLLLLLOOOOOOoo....', '..oOOOOLooNooLLLLLLLOOOOOOOOOo....',
+    '..oOOOOOoNENoLLLLLOOOOOOOOOOOo....', '...oOOOOooNooOOOOOOOOOOOOOOOo.....', '...ooOOOOoooDDDDDDDDDDOOOOOoo.....',
+    '....ooODDDDDDDDDDDDDDDDDDDoo......', '......oDDDDDDDDDDDDDDDDDDD........', '......oDooooDoDDDDDoDooooDo.......',
+    '......oDo..oDoooooooDo..oDo.......', '......ooo..ooo.....ooo..ooo.......', '..................................'
   ];
   var B = [
-    '................', '................', '.....oooooo.....', '.....oGGGGo.....',
-    '......oRRo......', '....oooooooo....', '...oLLLLLLLLo...', '..oOLLLLLLLLOo..',
-    '..oOoOLLLLOoOo..', '..oOOLLLLLLOOo..', '..oOOOOOOOOOOo..', '..oWoWoWoWoWWo..',
-    '..oOOOOOOOOOOo..', '...oOOOOOOOOo...', '....oooooooo....', '....o......o....'
+    '..................................', '..................................', '..................................',
+    '..................................', '....................oooo..........', '..o................oKKKKo.ooooooo.',
+    '.ooooo............oKKKKKKooKKKKKo.', '.ooGoooo.........oKKK..KKKooooooo.', 'ooGGGGGoooo.....oKK......KKooo....',
+    'ooGWWGGGGoooooooooooo....KKooo....', '.ooGGWWWGGGoooOOOOOOOooo.KKooo....', '..ooGGGGWWGoooLLLLOOOOOOooKooo....',
+    '...ooGGGGGGoooLLLLLLOOOOOOoooo....', '...oooooooooooLLLLLLLLOOOOOooo....', '...oOLLLLLLLLLLLLLLLLLOOOOOOoo....',
+    '..oOOOOLLLLLLLLLLLLLOOOOOOOOOo....', '..oOOOOOooooLLLLLLOOOOOOOOOOOo....', '...oOOOOOOOOOOOOOOOOOOOOOOOOo.....',
+    '...ooOOOOOODDDDDDDDDDDOOOOOoo.....', '....ooODDDDDDDDDDDDDDDDDDDoo......', '......oDDDDDDDDDDDDDDDDDDD........',
+    '......oDooooDoDDDDDoDooooDo.......', '......oDo..oDoooooooDo..oDo.......', '......ooo..ooo.....ooo..ooo.......'
   ];
 
   var canvas = document.getElementById('pochita');
   if (!canvas || !canvas.getContext) return;
   var ctx = canvas.getContext('2d');
-  var SCALE = 7;
+  var SCALE = 6;
 
   function draw(rows) {{
     ctx.clearRect(0, 0, canvas.width, canvas.height);
