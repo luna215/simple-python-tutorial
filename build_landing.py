@@ -108,12 +108,71 @@ TEMPLATE = """<!doctype html>
   blockquote p {{ margin: 0; }}
   hr {{ border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }}
   a:focus-visible {{ outline: 2px solid var(--accent); outline-offset: 3px; }}
+  #pochita {{
+    display: block;
+    margin: 0 auto 1.75rem;
+    image-rendering: pixelated;
+  }}
 </style>
 </head>
 <body>
 <main>
+<canvas id="pochita" width="112" height="112" role="img"
+        aria-label="Pixel art of Pochita, blinking"></canvas>
 {body}
 </main>
+<script>
+// 8-bit Pochita. Two frames, drawn pixel by pixel — no image files.
+(function () {{
+  var PAL = {{
+    'o': '#3a1a14', 'O': '#e27c34', 'L': '#f6ac64',
+    'K': '#1a100e', 'W': '#fcf6ec', 'G': '#9ea0aa', 'R': '#783c28'
+  }};
+  var A = [
+    '................', '.....oooooo.....', '.....oGGGGo.....', '......oRRo......',
+    '....oooooooo....', '...oLLLLLLLLo...', '..oOLLLLLLLLOo..', '..oOKOLLLLOKOo..',
+    '..oOOLLLLLLOOo..', '..oOOOOOOOOOOo..', '..oWoWoWoWoWWo..', '..oOOOOOOOOOOo..',
+    '...oOOOOOOOOo...', '....oooooooo....', '.....o....o.....', '................'
+  ];
+  var B = [
+    '................', '................', '.....oooooo.....', '.....oGGGGo.....',
+    '......oRRo......', '....oooooooo....', '...oLLLLLLLLo...', '..oOLLLLLLLLOo..',
+    '..oOoOLLLLOoOo..', '..oOOLLLLLLOOo..', '..oOOOOOOOOOOo..', '..oWoWoWoWoWWo..',
+    '..oOOOOOOOOOOo..', '...oOOOOOOOOo...', '....oooooooo....', '....o......o....'
+  ];
+
+  var canvas = document.getElementById('pochita');
+  if (!canvas || !canvas.getContext) return;
+  var ctx = canvas.getContext('2d');
+  var SCALE = 7;
+
+  function draw(rows) {{
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (var y = 0; y < rows.length; y++) {{
+      for (var x = 0; x < rows[y].length; x++) {{
+        var c = PAL[rows[y][x]];
+        if (c) {{ ctx.fillStyle = c; ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE); }}
+      }}
+    }}
+  }}
+
+  draw(A);
+
+  // Some people get motion sick, and some just don't want it. Respect that.
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (still && still.matches) return;
+
+  // Mostly sitting there, with the occasional bob and blink.
+  var timeline = [[A, 1400], [B, 180], [A, 900], [B, 180], [A, 2200], [B, 160]];
+  var i = 0;
+  (function step() {{
+    var frame = timeline[i % timeline.length];
+    draw(frame[0]);
+    i++;
+    setTimeout(step, frame[1]);
+  }})();
+}})();
+</script>
 </body>
 </html>
 """
