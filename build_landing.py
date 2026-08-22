@@ -204,7 +204,7 @@ TEMPLATE = """<!doctype html>
 // Because the paragraph comes later in the DOM it paints on top, so nudging
 // the Smiski down by its own height tucks it completely out of sight.
 (function () {{
-  var SPAL = {{ 'o': '#4a6a4a', 'L': '#a8d8a0', 'H': '#c6e8bc', 'K': '#2a3a2a' }};
+  var SPAL = {{ 'o': '#3d5c7d', 'L': '#9cc7e2', 'H': '#c6e3f4', 'K': '#22303e' }};
   var POSES = [
     ['...oooooo...', '..oHHHHHHo..', '.oHHHHHHHHo.', '.oHHHHHHHHo.', '.oLKKLLKKLo.', '.oLKKLLKKLo.', '.oLLLLLLLLo.', '.ooLLLLLLoo.', 'ooLLLLLLLLoo', 'oLoLLLLLLoLo', 'oLoLLLLLLoLo', 'oLoLLLLLLoLo', 'oooLLLLLLooo', '..oLLLLLLo..', '..oLLLLLLo..', '..oooooooo..'],
     ['...oooooo...', '..oHHHHHHo..', '.oHHHHHHHHo.', '.oHHHHHHHHo.', '.oLLKKLKKLo.', '.oLLKKLKKLo.', '.oLLLLLLLLo.', '.ooLLLLLLoo.', 'ooLLLLLLLLoo', 'oLoLLLLLLoLo', 'oLoLLLLLLoLo', 'oLoLLLLLLoLo', 'oooLLLLLLooo', '..oLLLLLLo..', '..oLLLLLLo..', '..oooooooo..'],
