@@ -89,7 +89,9 @@ TEMPLATE = """<!doctype html>
     border-radius: 10px;
     padding: 2.5rem 2.25rem 2.75rem;
   }}
-  h1, h2, h3 {{ line-height: 1.2; letter-spacing: -0.02em; margin: 2rem 0 0.75rem; }}
+  /* the 1.4rem below a heading is deliberate: it leaves a gap a Smiski
+     can peek up into without ever covering a word */
+  h1, h2, h3 {{ line-height: 1.2; letter-spacing: -0.02em; margin: 2rem 0 1.4rem; }}
   h1 {{ font-size: 1.9rem; margin-top: 0; }}
   h2 {{ font-size: 1.3rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); }}
   main > :first-child {{ margin-top: 0; }}
@@ -114,61 +116,52 @@ TEMPLATE = """<!doctype html>
     margin: 0 auto 1.75rem;
     image-rendering: pixelated;
   }}
+
+  /* Smiskis hide behind a line of text and climb out of it now and then. */
+  .peek-host {{ position: relative; height: 0; }}
+  .smiski {{
+    position: absolute;
+    bottom: 0;
+    image-rendering: pixelated;
+    pointer-events: none;
+    transform: translateY(100%);
+    transition: transform 640ms cubic-bezier(.2, .85, .3, 1);
+  }}
 </style>
 </head>
 <body>
 <main>
-<canvas id="pochita" width="180" height="144" role="img"
-        aria-label="Pixel art of Pochita, the chainsaw dog, wagging his tail"></canvas>
+<canvas id="pochita" width="204" height="144" role="img"
+        aria-label="Pixel art of Pochita, the chainsaw dog, bobbing gently"></canvas>
 {body}
 </main>
 <script>
-// 8-bit Pochita, drawn pixel by pixel. No image files, no requests.
-// Four frames: tail down / tail up, each with the eye open or shut.
+// ---------------------------------------------------------------- Pochita ---
+// Drawn pixel by pixel. No image files, no requests.
 (function () {{
   var PAL = {{
-    'o': '#141414', 'O': '#f28234', 'D': '#d64a24',
-    'G': '#8c8c8c', 'W': '#e4e4e4', 'N': '#ffffff', 'E': '#141414'
+    'o': '#3e261a', 'O': '#e8823a', 'L': '#f7ac6a', 'D': '#c6622a',
+    'K': '#282226', 'G': '#989aa0', 'W': '#f0f2f6', 'E': '#161212', 'N': '#fafafc'
   }};
   var A = [
-    '..............................', '........ooo...................', '.......oGGGo....oooo..........',
-    '......oGWWGGo..o....oo........', '.....oGWWWWGGo.o......o.......', '.....oGWWWGGGGo.o.....o.......',
-    '......oGGGGGGGo.o....oo.......', '.......ooooOOOOooOOOOo........', '......oOOOOOOOOOOOOOOo........',
-    '.....oOOOOOOOONNNOOOOOo.......', '.....oODOOOOOEENNOOOOOo.......', '.....oODDOOOOEENNOOOOOo.......',
-    '....oOOOOOOOOONNOOOOOOooo.....', '....oOOOOOOOOOOOOOOOOOo..oo...', '....oOODDOOOOODOOOOOOo....oo..',
-    '....oODDDOOOODDOOOOOOo........', '....oODDDOOOODDOOOOOo.........', '....oOODDOOOOOOOOOOo..........',
-    '....ooOOOOOOOOOOOOo...........', '...oo.oOOOOOOOOOOo............', '......ooooOOOOoooo............',
-    '.........oo.oooo.oo...........', '.........oo..oo..oo...........', '..............................'
+    '..................................', '..................................', '..................................',
+    '....................oooo..........', '..o................oKKKKo.ooooooo.', '.ooooo............oKKKKKKooKKKKKo.',
+    '.ooGoooo.........oKKK..KKKooooooo.', 'ooGGGGGoooo.....oKK......KKooo....', 'ooGWWGGGGoooooooooooo....KKooo....',
+    '.ooGGWWWGGGoooOOOOOOOooo.KKooo....', '..ooGGGGWWGoooLLLLOOOOOOooKooo....', '...ooGGGGGGoooLLLLLLOOOOOOoooo....',
+    '...oooooooooooLLLLLLLLOOOOOooo....', '...oOLLLLoooLLLLLLLLLLOOOOOOoo....', '..oOOOOLooNooLLLLLLLOOOOOOOOOo....',
+    '..oOOOOOoNENoLLLLLOOOOOOOOOOOo....', '...oOOOOooNooOOOOOOOOOOOOOOOo.....', '...ooOOOOoooDDDDDDDDDDOOOOOoo.....',
+    '....ooODDDDDDDDDDDDDDDDDDDoo......', '......oDDDDDDDDDDDDDDDDDDD........', '......oDooooDoDDDDDoDooooDo.......',
+    '......oDo..oDoooooooDo..oDo.......', '......ooo..ooo.....ooo..ooo.......', '..................................'
   ];
   var B = [
-    '..............................', '........ooo...................', '.......oGGGo....oooo..........',
-    '......oGWWGGo..o....oo........', '.....oGWWWWGGo.o......o.......', '.....oGWWWGGGGo.o.....o.......',
-    '......oGGGGGGGo.o....oo.......', '.......ooooOOOOooOOOOo........', '......oOOOOOOOOOOOOOOo....oo..',
-    '.....oOOOOOOOONNNOOOOOo..oo...', '.....oODOOOOOEENNOOOOOo.oo....', '.....oODDOOOOEENNOOOOOoo......',
-    '....oOOOOOOOOONNOOOOOOo.......', '....oOOOOOOOOOOOOOOOOOo.......', '....oOODDOOOOODOOOOOOo........',
-    '....oODDDOOOODDOOOOOOo........', '....oODDDOOOODDOOOOOo.........', '....oOODDOOOOOOOOOOo..........',
-    '....ooOOOOOOOOOOOOo...........', '...oo.oOOOOOOOOOOo............', '......ooooOOOOoooo............',
-    '.........oo.oooo.oo...........', '.........oo..oo..oo...........', '..............................'
-  ];
-  var C = [
-    '..............................', '........ooo...................', '.......oGGGo....oooo..........',
-    '......oGWWGGo..o....oo........', '.....oGWWWWGGo.o......o.......', '.....oGWWWGGGGo.o.....o.......',
-    '......oGGGGGGGo.o....oo.......', '.......ooooOOOOooOOOOo........', '......oOOOOOOOOOOOOOOo........',
-    '.....oOOOOOOOOOOOOOOOOo.......', '.....oODOOOOOOOOOOOOOOo.......', '.....oODDOOOOooooOOOOOo.......',
-    '....oOOOOOOOOOOOOOOOOOooo.....', '....oOOOOOOOOOOOOOOOOOo..oo...', '....oOODDOOOOODOOOOOOo....oo..',
-    '....oODDDOOOODDOOOOOOo........', '....oODDDOOOODDOOOOOo.........', '....oOODDOOOOOOOOOOo..........',
-    '....ooOOOOOOOOOOOOo...........', '...oo.oOOOOOOOOOOo............', '......ooooOOOOoooo............',
-    '.........oo.oooo.oo...........', '.........oo..oo..oo...........', '..............................'
-  ];
-  var D = [
-    '..............................', '........ooo...................', '.......oGGGo....oooo..........',
-    '......oGWWGGo..o....oo........', '.....oGWWWWGGo.o......o.......', '.....oGWWWGGGGo.o.....o.......',
-    '......oGGGGGGGo.o....oo.......', '.......ooooOOOOooOOOOo........', '......oOOOOOOOOOOOOOOo....oo..',
-    '.....oOOOOOOOOOOOOOOOOo..oo...', '.....oODOOOOOOOOOOOOOOo.oo....', '.....oODDOOOOooooOOOOOoo......',
-    '....oOOOOOOOOOOOOOOOOOo.......', '....oOOOOOOOOOOOOOOOOOo.......', '....oOODDOOOOODOOOOOOo........',
-    '....oODDDOOOODDOOOOOOo........', '....oODDDOOOODDOOOOOo.........', '....oOODDOOOOOOOOOOo..........',
-    '....ooOOOOOOOOOOOOo...........', '...oo.oOOOOOOOOOOo............', '......ooooOOOOoooo............',
-    '.........oo.oooo.oo...........', '.........oo..oo..oo...........', '..............................'
+    '..................................', '..................................', '..................................',
+    '..................................', '....................oooo..........', '..o................oKKKKo.ooooooo.',
+    '.ooooo............oKKKKKKooKKKKKo.', '.ooGoooo.........oKKK..KKKooooooo.', 'ooGGGGGoooo.....oKK......KKooo....',
+    'ooGWWGGGGoooooooooooo....KKooo....', '.ooGGWWWGGGoooOOOOOOOooo.KKooo....', '..ooGGGGWWGoooLLLLOOOOOOooKooo....',
+    '...ooGGGGGGoooLLLLLLOOOOOOoooo....', '...oooooooooooLLLLLLLLOOOOOooo....', '...oOLLLLLLLLLLLLLLLLLOOOOOOoo....',
+    '..oOOOOLLLLLLLLLLLLLOOOOOOOOOo....', '..oOOOOOooooLLLLLLOOOOOOOOOOOo....', '...oOOOOOOOOOOOOOOOOOOOOOOOOo.....',
+    '...ooOOOOOODDDDDDDDDDDOOOOOoo.....', '....ooODDDDDDDDDDDDDDDDDDDoo......', '......oDDDDDDDDDDDDDDDDDDD........',
+    '......oDooooDoDDDDDoDooooDo.......', '......oDo..oDoooooooDo..oDo.......', '......ooo..ooo.....ooo..ooo.......'
   ];
 
   var canvas = document.getElementById('pochita');
@@ -192,15 +185,98 @@ TEMPLATE = """<!doctype html>
   var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
   if (still && still.matches) return;
 
-  // Wag the tail constantly; blink every fourth second or so.
-  var tick = 0;
+  // Mostly sitting there, with the occasional bob and blink.
+  var timeline = [[A, 1400], [B, 180], [A, 900], [B, 180], [A, 2200], [B, 160]];
+  var i = 0;
   (function step() {{
-    var wagUp = (tick % 2 === 1);
-    var blink = (tick % 15 === 14);   // 15 is odd, so blinks alternate tail pose
-    draw(blink ? (wagUp ? D : C) : (wagUp ? B : A));
-    tick++;
-    setTimeout(step, blink ? 120 : 250);
+    var f = timeline[i % timeline.length];
+    draw(f[0]);
+    i++;
+    setTimeout(step, f[1]);
   }})();
+}})();
+
+// ---------------------------------------------------------------- Smiskis ---
+// They hide behind a paragraph and peek out of it every so often.
+//
+// The trick: each Smiski lives in a zero-height div inserted just BEFORE a
+// paragraph, and that paragraph is given the card's own background colour.
+// Because the paragraph comes later in the DOM it paints on top, so nudging
+// the Smiski down by its own height tucks it completely out of sight.
+(function () {{
+  var SPAL = {{ 'o': '#4a6a4a', 'L': '#a8d8a0', 'H': '#c6e8bc', 'K': '#2a3a2a' }};
+  var POSES = [
+    ['....oooooo....', '..ooHHHHHHoo..', '.oHHHHHHHHHHo.', '.oLLKKLLKKLLo.', '.oLLKKLLKKLLo.', '.oLLLLLLLLLLo.', '.oLLLLLLLLLLo.', '.oLLLLLLLLLLo.', '.ooLLLLLLLLoo.', 'ooLLLLLLLLLLoo', 'oLLLLLLLLLLLLo', 'oLLLLLLLLLLLLo'],
+    ['....oooooo....', '..ooHHHHHHoo..', '.oHHHHHHHHHHo.', '.oLLLKKLLKKLo.', '.oLLLKKLLKKLo.', '.oLLLLLLLLLLo.', '.oLLLLLLLLLLo.', '.oLLLLLLLLLLo.', '.ooLLLLLLLLoo.', 'ooLLLLLLLLLLoo', 'oLLLLLLLLLLLLo', 'oLLLLLLLLLLLLo'],
+    ['....oooooo....', '..ooHHHHHHoo..', '.oHHHHHHHHHHo.', '.oKKLLKKLLLLo.', '.oKKLLKKLLLLo.', '.oLLLLLLLLLLo.', '.oLLLLLLLLLLo.', '.oLLLLLLLLLLo.', '.ooLLLLLLLLoo.', 'ooLLLLLLLLLLoo', 'oLLLLLLLLLLLLo', 'oLLLLLLLLLLLLo']
+  ];
+  var SW = 14, SH = 12, SS = 4;
+
+  var main = document.querySelector('main');
+  if (!main) return;
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (still && still.matches) return;
+
+  function paint(canvas, rows) {{
+    var g = canvas.getContext('2d');
+    g.clearRect(0, 0, canvas.width, canvas.height);
+    for (var y = 0; y < rows.length; y++) {{
+      for (var x = 0; x < rows[y].length; x++) {{
+        var c = SPAL[rows[y][x]];
+        if (c) {{ g.fillStyle = c; g.fillRect(x * SS, y * SS, SS, SS); }}
+      }}
+    }}
+  }}
+
+  // Anchor only to paragraphs, and only where there is blank space above to
+  // rise into — so a Smiski can never cover a word or a link.
+  var cands = [].slice.call(main.querySelectorAll('p')).filter(function (el) {{
+    return el.offsetHeight >= SH * SS + 4;
+  }});
+
+  var slots = [];
+  for (var k = 0; k < cands.length && slots.length < 3; k++) {{
+    var el = cands[k];
+    var prev = el.previousElementSibling;
+    if (!prev) continue;
+
+    // vertical blank space between the block above and this paragraph
+    var gap = el.offsetTop - (prev.offsetTop + prev.offsetHeight);
+    var show = Math.min(gap - 3, SH * SS - 8);       // how much head to reveal
+    if (show < 10) continue;                          // not enough room, skip
+
+    el.style.position = 'relative';
+    el.style.background = 'var(--card)';
+
+    var host = document.createElement('div');
+    host.className = 'peek-host';
+    var c = document.createElement('canvas');
+    c.className = 'smiski';
+    c.width = SW * SS;
+    c.height = SH * SS;
+    c.setAttribute('aria-hidden', 'true');
+    c.style.left = (10 + slots.length * 30) + '%';
+    c.dataset.rise = 'translateY(' + (SH * SS - show) + 'px)';
+    paint(c, POSES[0]);
+    host.appendChild(c);
+    el.parentNode.insertBefore(host, el);
+    slots.push(c);
+  }}
+  if (!slots.length) return;
+
+  function peek() {{
+    var hidden = slots.filter(function (c) {{ return c.style.transform.indexOf('100%') !== -1
+                                                     || !c.style.transform; }});
+    if (hidden.length) {{
+      var c = hidden[Math.floor(Math.random() * hidden.length)];
+      paint(c, POSES[Math.floor(Math.random() * POSES.length)]);
+      c.style.transform = c.dataset.rise;
+      setTimeout(function () {{ c.style.transform = 'translateY(100%)'; }},
+                 2400 + Math.random() * 1400);
+    }}
+    setTimeout(peek, 3800 + Math.random() * 4500);
+  }}
+  setTimeout(peek, 1600);
 }})();
 </script>
 </body>
