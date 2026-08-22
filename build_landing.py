@@ -91,11 +91,11 @@ TEMPLATE = """<!doctype html>
   }}
   /* the 1.4rem below a heading is deliberate: it leaves a gap a Smiski
      can peek up into without ever covering a word */
-  h1, h2, h3 {{ line-height: 1.2; letter-spacing: -0.02em; margin: 2rem 0 1.4rem; }}
+  h1, h2, h3 {{ line-height: 1.2; letter-spacing: -0.02em; margin: 2rem 0 2rem; }}
   h1 {{ font-size: 1.9rem; margin-top: 0; }}
   h2 {{ font-size: 1.3rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); }}
   main > :first-child {{ margin-top: 0; }}
-  p, ul, ol {{ margin: 0 0 1rem; }}
+  p, ul, ol {{ margin: 0 0 1.5rem; }}
   li {{ margin-bottom: 0.4rem; }}
   a {{ color: var(--accent); text-underline-offset: 2px; }}
   strong {{ font-weight: 650; }}
@@ -206,11 +206,11 @@ TEMPLATE = """<!doctype html>
 (function () {{
   var SPAL = {{ 'o': '#4a6a4a', 'L': '#a8d8a0', 'H': '#c6e8bc', 'K': '#2a3a2a' }};
   var POSES = [
-    ['....oooooo....', '..ooHHHHHHoo..', '.oHHHHHHHHHHo.', '.oLLKKLLKKLLo.', '.oLLKKLLKKLLo.', '.oLLLLLLLLLLo.', '.oLLLLLLLLLLo.', '.oLLLLLLLLLLo.', '.ooLLLLLLLLoo.', 'ooLLLLLLLLLLoo', 'oLLLLLLLLLLLLo', 'oLLLLLLLLLLLLo'],
-    ['....oooooo....', '..ooHHHHHHoo..', '.oHHHHHHHHHHo.', '.oLLLKKLLKKLo.', '.oLLLKKLLKKLo.', '.oLLLLLLLLLLo.', '.oLLLLLLLLLLo.', '.oLLLLLLLLLLo.', '.ooLLLLLLLLoo.', 'ooLLLLLLLLLLoo', 'oLLLLLLLLLLLLo', 'oLLLLLLLLLLLLo'],
-    ['....oooooo....', '..ooHHHHHHoo..', '.oHHHHHHHHHHo.', '.oKKLLKKLLLLo.', '.oKKLLKKLLLLo.', '.oLLLLLLLLLLo.', '.oLLLLLLLLLLo.', '.oLLLLLLLLLLo.', '.ooLLLLLLLLoo.', 'ooLLLLLLLLLLoo', 'oLLLLLLLLLLLLo', 'oLLLLLLLLLLLLo']
+    ['...oooooo...', '..oHHHHHHo..', '.oHHHHHHHHo.', '.oHHHHHHHHo.', '.oLKKLLKKLo.', '.oLKKLLKKLo.', '.oLLLLLLLLo.', '.ooLLLLLLoo.', 'ooLLLLLLLLoo', 'oLoLLLLLLoLo', 'oLoLLLLLLoLo', 'oLoLLLLLLoLo', 'oooLLLLLLooo', '..oLLLLLLo..', '..oLLLLLLo..', '..oooooooo..'],
+    ['...oooooo...', '..oHHHHHHo..', '.oHHHHHHHHo.', '.oHHHHHHHHo.', '.oLLKKLKKLo.', '.oLLKKLKKLo.', '.oLLLLLLLLo.', '.ooLLLLLLoo.', 'ooLLLLLLLLoo', 'oLoLLLLLLoLo', 'oLoLLLLLLoLo', 'oLoLLLLLLoLo', 'oooLLLLLLooo', '..oLLLLLLo..', '..oLLLLLLo..', '..oooooooo..'],
+    ['...oooooo...', '..oHHHHHHo..', '.oHHHHHHHHo.', '.oHHHHHHHHo.', '.oKKLKKLLLo.', '.oKKLKKLLLo.', '.oLLLLLLLLo.', '.ooLLLLLLoo.', 'ooLLLLLLLLoo', 'oLoLLLLLLoLo', 'oLoLLLLLLoLo', 'oLoLLLLLLoLo', 'oooLLLLLLooo', '..oLLLLLLo..', '..oLLLLLLo..', '..oooooooo..']
   ];
-  var SW = 14, SH = 12, SS = 4;
+  var SW = 12, SH = 16, SS = 3;
 
   var main = document.querySelector('main');
   if (!main) return;
@@ -228,26 +228,21 @@ TEMPLATE = """<!doctype html>
     }}
   }}
 
-  // Anchor only to paragraphs, and only where there is blank space above to
-  // rise into — so a Smiski can never cover a word or a link.
-  var cands = [].slice.call(main.querySelectorAll('p')).filter(function (el) {{
-    return el.offsetHeight >= SH * SS + 4;
-  }});
-
-  var slots = [];
-  for (var k = 0; k < cands.length && slots.length < 3; k++) {{
-    var el = cands[k];
+  // Anchor to blocks with blank space above them, and only rise as far as that
+  // blank space allows — so a Smiski can never cover a word or a link.
+  var blocks = [];
+  [].slice.call(main.querySelectorAll('p, h3')).forEach(function (el) {{
     var prev = el.previousElementSibling;
-    if (!prev) continue;
-
-    // vertical blank space between the block above and this paragraph
+    if (!prev || el.offsetHeight < SH * SS + 4) return;
     var gap = el.offsetTop - (prev.offsetTop + prev.offsetHeight);
-    var show = Math.min(gap - 3, SH * SS - 8);       // how much head to reveal
-    if (show < 10) continue;                          // not enough room, skip
+    var show = Math.min(gap - 3, SH * SS - 6);
+    if (show >= 12) blocks.push({{ el: el, show: show }});
+  }});
+  if (!blocks.length) return;
 
-    el.style.position = 'relative';
-    el.style.background = 'var(--card)';
-
+  function makeSlot(b, leftPct) {{
+    b.el.style.position = 'relative';
+    b.el.style.background = 'var(--card)';
     var host = document.createElement('div');
     host.className = 'peek-host';
     var c = document.createElement('canvas');
@@ -255,28 +250,43 @@ TEMPLATE = """<!doctype html>
     c.width = SW * SS;
     c.height = SH * SS;
     c.setAttribute('aria-hidden', 'true');
-    c.style.left = (10 + slots.length * 30) + '%';
-    c.dataset.rise = 'translateY(' + (SH * SS - show) + 'px)';
+    c.style.left = leftPct + '%';
+    c.style.transform = 'translateY(100%)';
+    c.dataset.rise = 'translateY(' + (SH * SS - b.show) + 'px)';
     paint(c, POSES[0]);
     host.appendChild(c);
-    el.parentNode.insertBefore(host, el);
-    slots.push(c);
+    b.el.parentNode.insertBefore(host, b.el);
+    return c;
   }}
-  if (!slots.length) return;
+
+  // Several per block if need be, spread across the width, up to six.
+  var LEFTS = [7, 38, 66, 22, 52, 80];
+  var slots = [];
+  for (var pass = 0; pass < 3 && slots.length < 6; pass++) {{
+    for (var k = 0; k < blocks.length && slots.length < 6; k++) {{
+      slots.push(makeSlot(blocks[k], LEFTS[slots.length % LEFTS.length]));
+    }}
+  }}
+
+  function hiddenOnes() {{
+    return slots.filter(function (c) {{ return c.style.transform.indexOf('100%') !== -1; }});
+  }}
 
   function peek() {{
-    var hidden = slots.filter(function (c) {{ return c.style.transform.indexOf('100%') !== -1
-                                                     || !c.style.transform; }});
-    if (hidden.length) {{
-      var c = hidden[Math.floor(Math.random() * hidden.length)];
-      paint(c, POSES[Math.floor(Math.random() * POSES.length)]);
-      c.style.transform = c.dataset.rise;
-      setTimeout(function () {{ c.style.transform = 'translateY(100%)'; }},
-                 2400 + Math.random() * 1400);
+    var out = slots.length - hiddenOnes().length;
+    if (out < 2) {{
+      var hidden = hiddenOnes();
+      if (hidden.length) {{
+        var c = hidden[Math.floor(Math.random() * hidden.length)];
+        paint(c, POSES[Math.floor(Math.random() * POSES.length)]);
+        c.style.transform = c.dataset.rise;
+        setTimeout(function () {{ c.style.transform = 'translateY(100%)'; }},
+                   2600 + Math.random() * 1600);
+      }}
     }}
-    setTimeout(peek, 3800 + Math.random() * 4500);
+    setTimeout(peek, 2200 + Math.random() * 2400);
   }}
-  setTimeout(peek, 1600);
+  setTimeout(peek, 1200);
 }})();
 </script>
 </body>
