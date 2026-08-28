@@ -111,15 +111,9 @@ TEMPLATE = """<!doctype html>
   blockquote p {{ margin: 0; }}
   hr {{ border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }}
   a:focus-visible {{ outline: 2px solid var(--accent); outline-offset: 3px; }}
-  .mascots {{
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 1.75rem;
-  }}
-  #pochita, #bakugo {{
+  #pochita {{
     display: block;
+    margin: 0 auto 1.75rem;
     image-rendering: pixelated;
   }}
 
@@ -147,12 +141,8 @@ TEMPLATE = """<!doctype html>
 </head>
 <body>
 <main>
-<div class="mascots">
 <canvas id="pochita" width="204" height="144" role="img"
         aria-label="Pixel art of Pochita, the chainsaw dog, bobbing gently"></canvas>
-<canvas id="bakugo" width="144" height="144" role="img"
-        aria-label="Pixel art of Bakugo setting off an explosion"></canvas>
-</div>
 {body}
 </main>
 <script>
@@ -259,106 +249,6 @@ TEMPLATE = """<!doctype html>
     a.addEventListener('mouseleave', function () {{ setRev(false); }});
     a.addEventListener('focus',      function () {{ setRev(true); }});
     a.addEventListener('blur',       function () {{ setRev(false); }});
-  }});
-}})();
-
-
-// ----------------------------------------------------------------- Bakugo ---
-// Idles, and lets one off every eight seconds or so. Hovering a lesson link
-// sets him going continuously, at the same moment the chainsaw starts.
-(function () {{
-  var BPAL = {{
-    'o': '#1e1c22', 'H': '#f0e2a6', 'h': '#d6c484', 'S': '#f4cea8',
-    'R': '#c83630', 'M': '#783c34', 'K': '#2c2c36', 'O': '#e47c36',
-    'G': '#486042', 'F': '#ffd65c', 'f': '#f07824'
-  }};
-  var IDLE = [
-    '....o...o..o............', '...oHo.oHooHo...........', '..oHHHooHHoHHo..........',
-    '..oHHHHHHHHHHHo.........', '..oHHHHHHHHHHHo.........', '..ohhHHHHHHHhho.........',
-    '..oSSSSSSSSSSSo.........', '..oSooSSSSooSSo.........', '..oSRRSSSSRRSSo.........',
-    '..oSSSSSSSSSSSo.........', '..oSSSoMMMMoSSo.........', '...ooSSSSSSSoo..........',
-    '....oKKKKKKKo...........', '...oKOKKKKKOKo..........', '...oKKOKKKOKKoooooo.....',
-    '...oKKKOOOKKKoGGGGSo....', '..oKKKKKKKKKKoooooSo....', '..oGGoKKKKKoGo...ooo....',
-    '..oGGoKKKKKoGo..........', '...ooKKKKKKKoo..........', '....oKKooKKKo...........',
-    '....oKKo.oKKo...........', '....oooo.oooo...........', '........................'
-  ];
-  var BOOM1 = [
-    '....o...o..o............', '...oHo.oHooHo...........', '..oHHHooHHoHHo..........',
-    '..oHHHHHHHHHHHo.........', '..oHHHHHHHHHHHo.........', '..ohhHHHHHHHhho.........',
-    '..oSSSSSSSSSSSo.........', '..oSooSSSSooSSo.........', '..oSRRSSSSRRSSo.........',
-    '..oSSSSSSSSSSSo.........', '..oSSSoMMMMoSSo.........', '...ooSSSSSSSoo..........',
-    '....oKKKKKKKo...........', '...oKOKKKKKOKo..........', '...oKKOKKKOKKoooooof....',
-    '...oKKKOOOKKKoGGGGSFf...', '..oKKKKKKKKKKoooooSf....', '..oGGoKKKKKoGo...ooo....',
-    '..oGGoKKKKKoGo..........', '...ooKKKKKKKoo..........', '....oKKooKKKo...........',
-    '....oKKo.oKKo...........', '....oooo.oooo...........', '........................'
-  ];
-  var BOOM2 = [
-    '....o...o..o............', '...oHo.oHooHo...........', '..oHHHooHHoHHo..........',
-    '..oHHHHHHHHHHHo.........', '..oHHHHHHHHHHHo.........', '..ohhHHHHHHHhho.........',
-    '..oSSSSSSSSSSSo.........', '..oSooSSSSooSSo.........', '..oSRRSSSSRRSSo.........',
-    '..oSSSSSSSSSSSo.........', '..oSSSoMMMMoSSo.........', '...ooSSSSSSSoo..........',
-    '....oKKKKKKKo.......f...', '...oKOKKKKKOKo.....fFf..', '...oKKOKKKOKKooooooFFFf.',
-    '...oKKKOOOKKKoGGGGSFFFFf', '..oKKKKKKKKKKoooooSFFFf.', '..oGGoKKKKKoGo...oofFf..',
-    '..oGGoKKKKKoGo......f...', '...ooKKKKKKKoo..........', '....oKKooKKKo...........',
-    '....oKKo.oKKo...........', '....oooo.oooo...........', '........................'
-  ];
-  var BOOM3 = [
-    '....o...o..o............', '...oHo.oHooHo...........', '..oHHHooHHoHHo..........',
-    '..oHHHHHHHHHHHo.........', '..oHHHHHHHHHHHo.........', '..ohhHHHHHHHhho.........',
-    '..oSSSSSSSSSSSo.........', '..oSooSSSSooSSo.........', '..oSRRSSSSRRSSo.........',
-    '..oSSSSSSSSSSSo.........', '..oSSSoMMMMoSSo.........', '...ooSSSSSSSoo..........',
-    '....oKKKKKKKo........f..', '...oKOKKKKKOKo.........f', '...oKKOKKKOKKoooooo.f...',
-    '...oKKKOOOKKKoGGGGSo..f.', '..oKKKKKKKKKKoooooSo...f', '..oGGoKKKKKoGo...ooo.f..',
-    '..oGGoKKKKKoGo......f...', '...ooKKKKKKKoo..........', '....oKKooKKKo...........',
-    '....oKKo.oKKo...........', '....oooo.oooo...........', '........................'
-  ];
-
-  var canvas = document.getElementById('bakugo');
-  if (!canvas || !canvas.getContext) return;
-  var ctx = canvas.getContext('2d');
-  var S = 6;
-
-  function draw(rows) {{
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (var y = 0; y < rows.length; y++) {{
-      for (var x = 0; x < rows[y].length; x++) {{
-        var c = BPAL[rows[y][x]];
-        if (c) {{ ctx.fillStyle = c; ctx.fillRect(x * S, y * S, S, S); }}
-      }}
-    }}
-  }}
-
-  draw(IDLE);
-
-  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
-  if (still && still.matches) return;
-
-  function blast() {{ return [[BOOM1, 80], [BOOM2, 120], [BOOM3, 90], [IDLE, 150]]; }}
-
-  var queue = [], holding = false, timer = null;
-
-  function loop() {{
-    var frame, wait;
-    if (queue.length) {{
-      var s = queue.shift(); frame = s[0]; wait = s[1];
-    }} else if (holding) {{
-      queue = blast(); var t = queue.shift(); frame = t[0]; wait = t[1];
-    }} else {{
-      frame = IDLE; wait = 300;
-      if (Math.random() < 0.035) queue = blast();   // roughly every 8 seconds
-    }}
-    draw(frame);
-    timer = setTimeout(loop, wait);
-  }}
-  loop();
-
-  [].slice.call(document.querySelectorAll('main a')).forEach(function (a) {{
-    function on()  {{ if (!holding) {{ holding = true; clearTimeout(timer); queue = []; loop(); }} }}
-    function off() {{ holding = false; }}
-    a.addEventListener('mouseenter', on);
-    a.addEventListener('mouseleave', off);
-    a.addEventListener('focus', on);
-    a.addEventListener('blur', off);
   }});
 }})();
 
