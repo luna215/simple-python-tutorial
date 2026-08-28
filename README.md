@@ -1,6 +1,4 @@
-Hi Evolett,
 
-**Lesson 3 is up. Happy programming!!**
 
 ### [Lesson 1 — Devil Hunter Training](https://luna215.github.io/simple-python-tutorial/lab/index.html?path=devil-hunter-training.ipynb)
 
