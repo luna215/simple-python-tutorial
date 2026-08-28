@@ -127,6 +127,16 @@ TEMPLATE = """<!doctype html>
     transform: translateY(100%);
     transition: transform 640ms cubic-bezier(.2, .85, .3, 1);
   }}
+
+  /* Hovering a lesson link starts the chainsaw. Whole pixels only, no blur. */
+  @keyframes rev-shake {{
+    0%   {{ transform: translate(0, 0); }}
+    25%  {{ transform: translate(-1px, 1px); }}
+    50%  {{ transform: translate(1px, -1px); }}
+    75%  {{ transform: translate(1px, 1px); }}
+    100% {{ transform: translate(0, 0); }}
+  }}
+  #pochita.revving {{ animation: rev-shake 100ms steps(1) infinite; }}
 </style>
 </head>
 <body>
@@ -164,6 +174,27 @@ TEMPLATE = """<!doctype html>
     '......oDooooDoDDDDDoDooooDo.......', '......oDo..oDoooooooDo..oDo.......', '......ooo..ooo.....ooo..ooo.......'
   ];
 
+  var REV_A = [
+    '.......oo.........................', '...oo......oo.....................', '..................................',
+    '....................oooo..........', '..o................oKKKKo.ooooooo.', '.ooooo............oKKKKKKooKKKKKo.',
+    '.ooGoooo.........oKKK..KKKooooooo.', 'ooGGGGGoooo.....oKK......KKooo....', 'ooGWWGGGGoooooooooooo....KKooo....',
+    '.ooGGWWWGGGoooOOOOOOOooo.KKooo....', '..ooGGGGWWGoooLLLLOOOOOOooKooo....', '...ooGGGGGGoooLLLLLLOOOOOOoooo....',
+    '...oooooooooooLLLLLLLLOOOOOooo....', '...oOLLLLoooLLLLLLLLLLOOOOOOoo....', '..oOOOOLooNooLLLLLLLOOOOOOOOOo....',
+    '..oOOOOOoNENoLLLLLOOOOOOOOOOOo....', '...oOOOOooNooOOOOOOOOOOOOOOOo.....', '...ooOOOOoooDDDDDDDDDDOOOOOoo.....',
+    '....ooODDDDDDDDDDDDDDDDDDDoo......', '......oDDDDDDDDDDDDDDDDDDD........', '......oDooooDoDDDDDoDooooDo.......',
+    '......oDo..oDoooooooDo..oDo.......', '......ooo..ooo.....ooo..ooo.......', '..................................'
+  ];
+  var REV_B = [
+    '..................................', '........oo........................', '....oo......oo....................',
+    '....................oooo..........', '..o................oKKKKo.ooooooo.', '.ooooo............oKKKKKKooKKKKKo.',
+    '.ooGoooo.........oKKK..KKKooooooo.', 'ooGGGGGoooo.....oKK......KKooo....', 'ooGWWGGGGoooooooooooo....KKooo....',
+    '.ooGGWWWGGGoooOOOOOOOooo.KKooo....', '..ooGGGGWWGoooLLLLOOOOOOooKooo....', '...ooGGGGGGoooLLLLLLOOOOOOoooo....',
+    '...oooooooooooLLLLLLLLOOOOOooo....', '...oOLLLLoooLLLLLLLLLLOOOOOOoo....', '..oOOOOLooNooLLLLLLLOOOOOOOOOo....',
+    '..oOOOOOoNENoLLLLLOOOOOOOOOOOo....', '...oOOOOooNooOOOOOOOOOOOOOOOo.....', '...ooOOOOoooDDDDDDDDDDOOOOOoo.....',
+    '....ooODDDDDDDDDDDDDDDDDDDoo......', '......oDDDDDDDDDDDDDDDDDDD........', '......oDooooDoDDDDDoDooooDo.......',
+    '......oDo..oDoooooooDo..oDo.......', '......ooo..ooo.....ooo..ooo.......', '..................................'
+  ];
+
   var canvas = document.getElementById('pochita');
   if (!canvas || !canvas.getContext) return;
   var ctx = canvas.getContext('2d');
@@ -187,13 +218,38 @@ TEMPLATE = """<!doctype html>
 
   // Mostly sitting there, with the occasional bob and blink.
   var timeline = [[A, 1400], [B, 180], [A, 900], [B, 180], [A, 2200], [B, 160]];
-  var i = 0;
-  (function step() {{
-    var f = timeline[i % timeline.length];
-    draw(f[0]);
-    i++;
-    setTimeout(step, f[1]);
-  }})();
+  var i = 0, revving = false, revTick = 0, timer = null;
+
+  function loop() {{
+    if (revving) {{
+      draw(revTick++ % 2 ? REV_B : REV_A);
+      timer = setTimeout(loop, 70);
+    }} else {{
+      var f = timeline[i++ % timeline.length];
+      draw(f[0]);
+      timer = setTimeout(loop, f[1]);
+    }}
+  }}
+  loop();
+
+  // Hover a lesson link and the chainsaw starts: the frames supply the smoke,
+  // the CSS class supplies the shake. clearTimeout so it reacts straight away
+  // instead of waiting out a two-second idle frame.
+  function setRev(on) {{
+    if (revving === on) return;
+    revving = on;
+    revTick = 0;
+    canvas.classList.toggle('revving', on);
+    clearTimeout(timer);
+    loop();
+  }}
+
+  [].slice.call(document.querySelectorAll('main a')).forEach(function (a) {{
+    a.addEventListener('mouseenter', function () {{ setRev(true); }});
+    a.addEventListener('mouseleave', function () {{ setRev(false); }});
+    a.addEventListener('focus',      function () {{ setRev(true); }});
+    a.addEventListener('blur',       function () {{ setRev(false); }});
+  }});
 }})();
 
 // ---------------------------------------------------------------- Smiskis ---
