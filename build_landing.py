@@ -128,6 +128,35 @@ TEMPLATE = """<!doctype html>
     transition: transform 640ms cubic-bezier(.2, .85, .3, 1);
   }}
 
+  /* The first Smiski says hello. Real text, not pixels — it has to be readable. */
+  .smiski-say {{
+    position: absolute;
+    bottom: 4px;
+    white-space: nowrap;
+    font-size: 0.68rem;
+    line-height: 1.25;
+    font-weight: 650;
+    color: var(--ink);
+    background: var(--card);
+    border: 2px solid #3d5c7d;
+    border-radius: 5px;
+    padding: 0.08rem 0.36rem;
+    opacity: 0;
+    transform: translate(-5px, 3px);
+    transition: opacity 220ms ease, transform 220ms ease;
+    pointer-events: none;
+  }}
+  .smiski-say::before,
+  .smiski-say::after {{
+    content: '';
+    position: absolute;
+    bottom: 3px;
+    border: 5px solid transparent;
+  }}
+  .smiski-say::before {{ left: -10px; border-right-color: #3d5c7d; }}
+  .smiski-say::after  {{ left: -7px;  border-right-color: var(--card); }}
+  .smiski-say.show {{ opacity: 1; transform: translate(0, 0); }}
+
   /* Hovering a lesson link starts the chainsaw. Whole pixels only, no blur. */
   @keyframes rev-shake {{
     0%   {{ transform: translate(0, 0); }}
@@ -311,6 +340,17 @@ TEMPLATE = """<!doctype html>
     c.dataset.rise = 'translateY(' + (SH * SS - b.show) + 'px)';
     paint(c, POSES[0]);
     host.appendChild(c);
+
+    // Only the first one talks.
+    if (slots.length === 0) {{
+      var say = document.createElement('span');
+      say.className = 'smiski-say';
+      say.textContent = 'Hi Evolett!';
+      say.style.left = 'calc(' + leftPct + '% + ' + (SW * SS + 12) + 'px)';
+      host.appendChild(say);
+      c.bubble = say;
+    }}
+
     b.el.parentNode.insertBefore(host, b.el);
     return c;
   }}
@@ -336,8 +376,14 @@ TEMPLATE = """<!doctype html>
         var c = hidden[Math.floor(Math.random() * hidden.length)];
         paint(c, POSES[Math.floor(Math.random() * POSES.length)]);
         c.style.transform = c.dataset.rise;
-        setTimeout(function () {{ c.style.transform = 'translateY(100%)'; }},
-                   2600 + Math.random() * 1600);
+        if (c.bubble) {{
+          var bub = c.bubble;
+          setTimeout(function () {{ bub.classList.add('show'); }}, 280);
+        }}
+        setTimeout(function () {{
+          c.style.transform = 'translateY(100%)';
+          if (c.bubble) c.bubble.classList.remove('show');
+        }}, 2600 + Math.random() * 1600);
       }}
     }}
     setTimeout(peek, 2200 + Math.random() * 2400);
