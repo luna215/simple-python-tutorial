@@ -16,7 +16,8 @@ somebody types words into a number.
 ### [Lesson 3 — Blueprints](https://luna215.github.io/simple-python-tutorial/lab/index.html?path=blueprints.ipynb)
 
 Stop describing devils one at a time and write down what a devil *is*. Then make
-a Gun Devil that's a Devil plus a difference. This is the one where you stop
+a Gun Devil that gets everything a Devil already has for free, and only writes
+down the one thing that makes it different. This is the one where you stop
 using Python's nouns and start writing your own.
 
 ---
