@@ -111,11 +111,37 @@ TEMPLATE = """<!doctype html>
   blockquote p {{ margin: 0; }}
   hr {{ border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }}
   a:focus-visible {{ outline: 2px solid var(--accent); outline-offset: 3px; }}
-  #pochita {{
-    display: block;
-    margin: 0 auto 1.75rem;
-    image-rendering: pixelated;
+  .poch-wrap {{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.75rem;
   }}
+  #pochita {{ display: block; image-rendering: pixelated; }}
+  .poch-say {{
+    position: absolute;
+    left: 50%;
+    margin-left: 112px;
+    top: 30px;
+    max-width: 9.5rem;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    font-weight: 650;
+    color: var(--ink);
+    background: var(--card);
+    border: 2px solid #b8763c;
+    border-radius: 6px;
+    padding: 0.25rem 0.45rem;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 300ms ease, transform 300ms ease;
+    pointer-events: none;
+  }}
+  .poch-say::before,
+  .poch-say::after {{ content: ''; position: absolute; top: 9px; border: 6px solid transparent; }}
+  .poch-say::before {{ left: -12px; border-right-color: #b8763c; }}
+  .poch-say::after  {{ left: -9px;  border-right-color: var(--card); }}
+  .poch-say.show {{ opacity: 1; transform: none; }}
 
   /* Smiskis hide behind a line of text and climb out of it now and then. */
   .peek-host {{ position: relative; height: 0; }}
@@ -155,6 +181,9 @@ TEMPLATE = """<!doctype html>
   }}
   .smiski-say::before {{ left: -10px; border-right-color: #3d5c7d; }}
   .smiski-say::after  {{ left: -7px;  border-right-color: var(--card); }}
+  /* on the right-hand Smiskis the bubble sits to their left, so the tail flips */
+  .smiski-say.flip::before {{ left: auto; right: -10px; border-right-color: transparent; border-left-color: #3d5c7d; }}
+  .smiski-say.flip::after  {{ left: auto; right: -7px;  border-right-color: transparent; border-left-color: var(--card); }}
   .smiski-say.show {{ opacity: 1; transform: translate(0, 0); }}
 
   /* Hovering a lesson link starts the chainsaw. Whole pixels only, no blur. */
@@ -170,8 +199,11 @@ TEMPLATE = """<!doctype html>
 </head>
 <body>
 <main>
+<div class="poch-wrap">
 <canvas id="pochita" width="204" height="144" role="img"
         aria-label="Pixel art of Pochita, the chainsaw dog, bobbing gently"></canvas>
+<span class="poch-say">Hi Evolett! Lesson 3 is up!</span>
+</div>
 {body}
 </main>
 <script>
@@ -240,6 +272,9 @@ TEMPLATE = """<!doctype html>
   }}
 
   draw(A);
+
+  var bubble = document.querySelector('.poch-say');
+  if (bubble) setTimeout(function () {{ bubble.classList.add('show'); }}, 700);
 
   // Some people get motion sick, and some just don't want it. Respect that.
   var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -341,15 +376,19 @@ TEMPLATE = """<!doctype html>
     paint(c, POSES[0]);
     host.appendChild(c);
 
-    // Only the first one talks.
-    if (slots.length === 0) {{
-      var say = document.createElement('span');
-      say.className = 'smiski-say';
-      say.textContent = 'Hi Evolett!';
+    // Every slot carries a greeting; only the first one to actually appear
+    // will ever show it. Right-hand slots put the bubble on their left so it
+    // can't run off the edge of the card.
+    var say = document.createElement('span');
+    say.className = 'smiski-say';
+    if (leftPct > 50) {{
+      say.classList.add('flip');
+      say.style.right = 'calc(' + (100 - leftPct) + '% + ' + (SW * SS + 12) + 'px)';
+    }} else {{
       say.style.left = 'calc(' + leftPct + '% + ' + (SW * SS + 12) + 'px)';
-      host.appendChild(say);
-      c.bubble = say;
     }}
+    host.appendChild(say);
+    c.bubble = say;
 
     b.el.parentNode.insertBefore(host, b.el);
     return c;
@@ -358,6 +397,18 @@ TEMPLATE = """<!doctype html>
   // Several per block if need be, spread across the width, up to six.
   var LEFTS = [7, 38, 66, 22, 52, 80];
   var slots = [];
+  var PHRASES = [
+    'You found me.',
+    'I was here the whole time.',
+    "Don't mind me. Keep going.",
+    'Oh \u2014 hello!',
+    'Still here. Still hiding.',
+    "Psst\u2026 you've got this.",
+    'Welcome back, Evolett!',
+    "How's it going, Evolett?",
+    'Ready for lesson 3?'
+  ];
+  var lastPhrase = -1;
   for (var pass = 0; pass < 3 && slots.length < 6; pass++) {{
     for (var k = 0; k < blocks.length && slots.length < 6; k++) {{
       slots.push(makeSlot(blocks[k], LEFTS[slots.length % LEFTS.length]));
@@ -377,6 +428,10 @@ TEMPLATE = """<!doctype html>
         paint(c, POSES[Math.floor(Math.random() * POSES.length)]);
         c.style.transform = c.dataset.rise;
         if (c.bubble) {{
+          var n = Math.floor(Math.random() * PHRASES.length);
+          if (n === lastPhrase) n = (n + 1) % PHRASES.length;   // no immediate repeats
+          lastPhrase = n;
+          c.bubble.textContent = PHRASES[n];
           var bub = c.bubble;
           setTimeout(function () {{ bub.classList.add('show'); }}, 280);
         }}
