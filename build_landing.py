@@ -121,7 +121,7 @@ TEMPLATE = """<!doctype html>
   .poch-say {{
     position: absolute;
     left: 50%;
-    margin-left: 112px;
+    margin-left: 145px;
     top: 30px;
     max-width: 9.5rem;
     font-size: 0.72rem;
@@ -200,78 +200,107 @@ TEMPLATE = """<!doctype html>
 <body>
 <main>
 <div class="poch-wrap">
-<canvas id="pochita" width="204" height="144" role="img"
-        aria-label="Pixel art of Pochita, the chainsaw dog, bobbing gently"></canvas>
+<canvas id="pochita" width="270" height="162" role="img"
+        aria-label="Pixel art of Pochita, the chainsaw dog, walking"></canvas>
 <span class="poch-say">Hi Evolett! Lesson 3 is up!</span>
 </div>
 {body}
 </main>
 <script>
 // ---------------------------------------------------------------- Pochita ---
-// Drawn pixel by pixel. No image files, no requests.
+// Traced from Paul's reference art, then given a four-frame walk cycle.
+// Drawn pixel by pixel — no image files, no requests.
 (function () {{
   var PAL = {{
-    'o': '#3e261a', 'O': '#e8823a', 'L': '#f7ac6a', 'D': '#c6622a',
-    'K': '#282226', 'G': '#989aa0', 'W': '#f0f2f6', 'E': '#161212', 'N': '#fafafc'
+    'a': '#000000',
+    'b': '#373737',
+    'c': '#646464',
+    'd': '#1e0000',
+    'e': '#979797',
+    'f': '#5b210b',
+    'g': '#482917',
+    'h': '#aa4e29',
+    'i': '#ff7c14',
+    'j': '#5d3221',
+    'k': '#e07c40',
+    'l': '#f07e28',
+    'm': '#c24c1e',
+    'n': '#d44a02',
+    'o': '#d9dbda',
+    'p': '#d54d19',
+    'q': '#701f00',
+    'r': '#fff9e9'
   }};
-  var A = [
-    '..................................', '..................................', '..................................',
-    '....................oooo..........', '..o................oKKKKo.ooooooo.', '.ooooo............oKKKKKKooKKKKKo.',
-    '.ooGoooo.........oKKK..KKKooooooo.', 'ooGGGGGoooo.....oKK......KKooo....', 'ooGWWGGGGoooooooooooo....KKooo....',
-    '.ooGGWWWGGGoooOOOOOOOooo.KKooo....', '..ooGGGGWWGoooLLLLOOOOOOooKooo....', '...ooGGGGGGoooLLLLLLOOOOOOoooo....',
-    '...oooooooooooLLLLLLLLOOOOOooo....', '...oOLLLLoooLLLLLLLLLLOOOOOOoo....', '..oOOOOLooNooLLLLLLLOOOOOOOOOo....',
-    '..oOOOOOoNENoLLLLLOOOOOOOOOOOo....', '...oOOOOooNooOOOOOOOOOOOOOOOo.....', '...ooOOOOoooDDDDDDDDDDOOOOOoo.....',
-    '....ooODDDDDDDDDDDDDDDDDDDoo......', '......oDDDDDDDDDDDDDDDDDDD........', '......oDooooDoDDDDDoDooooDo.......',
-    '......oDo..oDoooooooDo..oDo.......', '......ooo..ooo.....ooo..ooo.......', '..................................'
+  var W1 = [
+    '.......................aaaa..................', '....................aaabccca.................', '.................adabcccbcba.................',
+    '................abcccbaabcba.................', '....bb..bb..bb..acbaaa.acba..................', '....beb.beb.bebfffffffgacba..................',
+    '.gb.bbbbbbbbbbghiiiiiiiacbagff...............', '.bebcececececjkliiiiiiiacbaklmffj..jgfaa.....', '..bcebbbbbbbghiiiiiiiilaaaiiiiilnffhllbcaaa..',
+    '.bbebooeeooojliiiiiiiiiiiiiiiiiiilmlpqaacccaa', 'bebcbooeeooghiiiiiorrliiiiiiiiiiiiiif..abaaca', 'bbbebeooeeofliiiioahrriiiiiiiiiiiiinq.abaabba',
+    '..bccbeoeeofliiiiraaarliiiiiiiiiiiiqa.abbbaa.', '.bebecbbbbbfliiiiraahriiiiiiiiiiiiiqbaabaa...', '.bbbbcececefiiiiilrrrkiiiiiiiiiiiiiqbaaa.....',
+    '....bbbbbbbfliiiiiiiiiiiiiiiiiiiiiiqaba......', '....beb.bebfliiniiiiiiiiiiiiiiiiiiiqaba......', '.....bb.fbbfmlnqiiniiiiniiiiiniiiiiqaba......',
+    '........flmffqfkiinmiipniiiiqliiiiiqbba......', '.........qqmmliiiinmppnniiiiqliiiiiqaa.......', '..........apnnpppiimpmmnliilqpiiiina.........',
+    '..........mpnmpnppnmpmpplppnqppppna..........', '..........mpnmpmpppppliilmppddpnnd...........', '..........mmnmpmpppppmlllmpdhaplma...........',
+    '.........ajmaaaajmaaaaajmaaaajma.............', '.........ahpa..ahpa...ahpa..ahpa.............', '.........adaa..adaa...adaa..adaa.............'
   ];
-  var B = [
-    '..................................', '..................................', '..................................',
-    '..................................', '....................oooo..........', '..o................oKKKKo.ooooooo.',
-    '.ooooo............oKKKKKKooKKKKKo.', '.ooGoooo.........oKKK..KKKooooooo.', 'ooGGGGGoooo.....oKK......KKooo....',
-    'ooGWWGGGGoooooooooooo....KKooo....', '.ooGGWWWGGGoooOOOOOOOooo.KKooo....', '..ooGGGGWWGoooLLLLOOOOOOooKooo....',
-    '...ooGGGGGGoooLLLLLLOOOOOOoooo....', '...oooooooooooLLLLLLLLOOOOOooo....', '...oOLLLLLLLLLLLLLLLLLOOOOOOoo....',
-    '..oOOOOLLLLLLLLLLLLLOOOOOOOOOo....', '..oOOOOOooooLLLLLLOOOOOOOOOOOo....', '...oOOOOOOOOOOOOOOOOOOOOOOOOo.....',
-    '...ooOOOOOODDDDDDDDDDDOOOOOoo.....', '....ooODDDDDDDDDDDDDDDDDDDoo......', '......oDDDDDDDDDDDDDDDDDDD........',
-    '......oDooooDoDDDDDoDooooDo.......', '......oDo..oDoooooooDo..oDo.......', '......ooo..ooo.....ooo..ooo.......'
+  var W2 = [
+    '.......................aaaa..................', '....................aaabccca.................', '.................adabcccbcba.................',
+    '................abcccbaabcba.................', '....bb..bb..bb..acbaaa.acba..................', '....beb.beb.bebfffffffgacba..................',
+    '.gb.bbbbbbbbbbghiiiiiiiacbagff...............', '.bebcececececjkliiiiiiiacbaklmffj..jgfaa.....', '..bcebbbbbbbghiiiiiiiilaaaiiiiilnffhllbcaaa..',
+    '.bbebooeeooojliiiiiiiiiiiiiiiiiiilmlpqaacccaa', 'bebcbooeeooghiiiiiorrliiiiiiiiiiiiiif..abaaca', 'bbbebeooeeofliiiioahrriiiiiiiiiiiiinq.abaabba',
+    '..bccbeoeeofliiiiraaarliiiiiiiiiiiiqa.abbbaa.', '.bebecbbbbbfliiiiraahriiiiiiiiiiiiiqbaabaa...', '.bbbbcececefiiiiilrrrkiiiiiiiiiiiiiqbaaa.....',
+    '....bbbbbbbfliiiiiiiiiiiiiiiiiiiiiiqaba......', '....beb.bebfliiniiiiiiiiiiiiiiiiiiiqaba......', '.....bb.fbbfmlnqiiniiiiniiiiiniiiiiqaba......',
+    '........flmffqfkiinmiipniiiiqliiiiiqbba......', '.........qqmmliiiinmppnniiiiqliiiiiqaa.......', '..........apnnpppiimpmmnliilqpiiiina.........',
+    '..........mpnmpnppnmpmpplppnqppppna..........', '..........mpnmpmpppppliilmppddpnnd...........', '..........mmnmpmpppppmlllmpdhaplma...........',
+    '.........ajmaaaajmaaaaajmaaaajma.............', '..........ahpa.ahpa....ahpa.ahpa.............', '..........adaa.adaa....adaa.adaa.............'
   ];
+  var W3 = [
+    '.......................aaaa..................', '....................aaabccca.................', '.................adabcccbcba.................',
+    '................abcccbaabcba.................', '....bb..bb..bb..acbaaa.acba..................', '....beb.beb.bebfffffffgacba..................',
+    '.gb.bbbbbbbbbbghiiiiiiiacbagff...............', '.bebcececececjkliiiiiiiacbaklmffj..jgfaa.....', '..bcebbbbbbbghiiiiiiiilaaaiiiiilnffhllbcaaa..',
+    '.bbebooeeooojliiiiiiiiiiiiiiiiiiilmlpqaacccaa', 'bebcbooeeooghiiiiiorrliiiiiiiiiiiiiif..abaaca', 'bbbebeooeeofliiiioahrriiiiiiiiiiiiinq.abaabba',
+    '..bccbeoeeofliiiiraaarliiiiiiiiiiiiqa.abbbaa.', '.bebecbbbbbfliiiiraahriiiiiiiiiiiiiqbaabaa...', '.bbbbcececefiiiiilrrrkiiiiiiiiiiiiiqbaaa.....',
+    '....bbbbbbbfliiiiiiiiiiiiiiiiiiiiiiqaba......', '....beb.bebfliiniiiiiiiiiiiiiiiiiiiqaba......', '.....bb.fbbfmlnqiiniiiiniiiiiniiiiiqaba......',
+    '........flmffqfkiinmiipniiiiqliiiiiqbba......', '.........qqmmliiiinmppnniiiiqliiiiiqaa.......', '..........apnnpppiimpmmnliilqpiiiina.........',
+    '..........mpnmpnppnmpmpplppnqppppna..........', '..........mpnmpmpppppliilmppddpnnd...........', '..........mmnmpmpppppmlllmpdhaplma...........',
+    '.........ajmaaaajmaaaaajmaaaajma.............', '.........ahpa..ahpa...ahpa..ahpa.............', '.........adaa..adaa...adaa..adaa.............'
+  ];
+  var W4 = [
+    '.......................aaaa..................', '....................aaabccca.................', '.................adabcccbcba.................',
+    '................abcccbaabcba.................', '....bb..bb..bb..acbaaa.acba..................', '....beb.beb.bebfffffffgacba..................',
+    '.gb.bbbbbbbbbbghiiiiiiiacbagff...............', '.bebcececececjkliiiiiiiacbaklmffj..jgfaa.....', '..bcebbbbbbbghiiiiiiiilaaaiiiiilnffhllbcaaa..',
+    '.bbebooeeooojliiiiiiiiiiiiiiiiiiilmlpqaacccaa', 'bebcbooeeooghiiiiiorrliiiiiiiiiiiiiif..abaaca', 'bbbebeooeeofliiiioahrriiiiiiiiiiiiinq.abaabba',
+    '..bccbeoeeofliiiiraaarliiiiiiiiiiiiqa.abbbaa.', '.bebecbbbbbfliiiiraahriiiiiiiiiiiiiqbaabaa...', '.bbbbcececefiiiiilrrrkiiiiiiiiiiiiiqbaaa.....',
+    '....bbbbbbbfliiiiiiiiiiiiiiiiiiiiiiqaba......', '....beb.bebfliiniiiiiiiiiiiiiiiiiiiqaba......', '.....bb.fbbfmlnqiiniiiiniiiiiniiiiiqaba......',
+    '........flmffqfkiinmiipniiiiqliiiiiqbba......', '.........qqmmliiiinmppnniiiiqliiiiiqaa.......', '..........apnnpppiimpmmnliilqpiiiina.........',
+    '..........mpnmpnppnmpmpplppnqppppna..........', '..........mpnmpmpppppliilmppddpnnd...........', '..........mmnmpmpppppmlllmpdhaplma...........',
+    '.........ajmaaaajmaaaaajmaaaajma.............', '.........ahpa.ahpa....ahpa.ahpa..............', '.........adaa.adaa....adaa.adaa..............'
+  ];
+  var WALK = [W1, W2, W3, W4];
 
-  var REV_A = [
-    '.......oo.........................', '...oo......oo.....................', '..................................',
-    '....................oooo..........', '..o................oKKKKo.ooooooo.', '.ooooo............oKKKKKKooKKKKKo.',
-    '.ooGoooo.........oKKK..KKKooooooo.', 'ooGGGGGoooo.....oKK......KKooo....', 'ooGWWGGGGoooooooooooo....KKooo....',
-    '.ooGGWWWGGGoooOOOOOOOooo.KKooo....', '..ooGGGGWWGoooLLLLOOOOOOooKooo....', '...ooGGGGGGoooLLLLLLOOOOOOoooo....',
-    '...oooooooooooLLLLLLLLOOOOOooo....', '...oOLLLLoooLLLLLLLLLLOOOOOOoo....', '..oOOOOLooNooLLLLLLLOOOOOOOOOo....',
-    '..oOOOOOoNENoLLLLLOOOOOOOOOOOo....', '...oOOOOooNooOOOOOOOOOOOOOOOo.....', '...ooOOOOoooDDDDDDDDDDOOOOOoo.....',
-    '....ooODDDDDDDDDDDDDDDDDDDoo......', '......oDDDDDDDDDDDDDDDDDDD........', '......oDooooDoDDDDDoDooooDo.......',
-    '......oDo..oDoooooooDo..oDo.......', '......ooo..ooo.....ooo..ooo.......', '..................................'
-  ];
-  var REV_B = [
-    '..................................', '........oo........................', '....oo......oo....................',
-    '....................oooo..........', '..o................oKKKKo.ooooooo.', '.ooooo............oKKKKKKooKKKKKo.',
-    '.ooGoooo.........oKKK..KKKooooooo.', 'ooGGGGGoooo.....oKK......KKooo....', 'ooGWWGGGGoooooooooooo....KKooo....',
-    '.ooGGWWWGGGoooOOOOOOOooo.KKooo....', '..ooGGGGWWGoooLLLLOOOOOOooKooo....', '...ooGGGGGGoooLLLLLLOOOOOOoooo....',
-    '...oooooooooooLLLLLLLLOOOOOooo....', '...oOLLLLoooLLLLLLLLLLOOOOOOoo....', '..oOOOOLooNooLLLLLLLOOOOOOOOOo....',
-    '..oOOOOOoNENoLLLLLOOOOOOOOOOOo....', '...oOOOOooNooOOOOOOOOOOOOOOOo.....', '...ooOOOOoooDDDDDDDDDDOOOOOoo.....',
-    '....ooODDDDDDDDDDDDDDDDDDDoo......', '......oDDDDDDDDDDDDDDDDDDD........', '......oDooooDoDDDDDoDooooDo.......',
-    '......oDo..oDoooooooDo..oDo.......', '......ooo..ooo.....ooo..ooo.......', '..................................'
-  ];
+  // exhaust puffs above the blade, only while the chainsaw is revving
+  var TICK_A = [[3,1],[4,1],[7,0],[8,0],[11,1],[12,1]];
+  var TICK_B = [[4,2],[5,2],[8,1],[9,1],[12,2],[13,2]];
 
   var canvas = document.getElementById('pochita');
   if (!canvas || !canvas.getContext) return;
   var ctx = canvas.getContext('2d');
-  var SCALE = 6;
+  var S = 6;
 
-  function draw(rows) {{
+  function draw(rows, ticks) {{
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (var y = 0; y < rows.length; y++) {{
       for (var x = 0; x < rows[y].length; x++) {{
         var c = PAL[rows[y][x]];
-        if (c) {{ ctx.fillStyle = c; ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE); }}
+        if (c) {{ ctx.fillStyle = c; ctx.fillRect(x * S, y * S, S, S); }}
       }}
+    }}
+    if (ticks) {{
+      ctx.fillStyle = '#3e261a';
+      for (var i = 0; i < ticks.length; i++) ctx.fillRect(ticks[i][0]*S, ticks[i][1]*S, S, S);
     }}
   }}
 
-  draw(A);
+  draw(WALK[0], null);
 
   var bubble = document.querySelector('.poch-say');
   if (bubble) setTimeout(function () {{ bubble.classList.add('show'); }}, 700);
@@ -280,34 +309,23 @@ TEMPLATE = """<!doctype html>
   var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
   if (still && still.matches) return;
 
-  // Mostly sitting there, with the occasional bob and blink.
-  var timeline = [[A, 1400], [B, 180], [A, 900], [B, 180], [A, 2200], [B, 160]];
-  var i = 0, revving = false, revTick = 0, timer = null;
-
+  var i = 0, revving = false, timer = null;
   function loop() {{
-    if (revving) {{
-      draw(revTick++ % 2 ? REV_B : REV_A);
-      timer = setTimeout(loop, 70);
-    }} else {{
-      var f = timeline[i++ % timeline.length];
-      draw(f[0]);
-      timer = setTimeout(loop, f[1]);
-    }}
+    var f = WALK[i % WALK.length];
+    draw(f, revving ? (i % 2 ? TICK_B : TICK_A) : null);
+    i++;
+    timer = setTimeout(loop, revving ? 90 : 180);   // he picks up the pace when revving
   }}
   loop();
 
-  // Hover a lesson link and the chainsaw starts: the frames supply the smoke,
-  // the CSS class supplies the shake. clearTimeout so it reacts straight away
-  // instead of waiting out a two-second idle frame.
+  // Hover a lesson link: chainsaw starts, he speeds up, the CSS class shakes him.
   function setRev(on) {{
     if (revving === on) return;
     revving = on;
-    revTick = 0;
     canvas.classList.toggle('revving', on);
     clearTimeout(timer);
     loop();
   }}
-
   [].slice.call(document.querySelectorAll('main a')).forEach(function (a) {{
     a.addEventListener('mouseenter', function () {{ setRev(true); }});
     a.addEventListener('mouseleave', function () {{ setRev(false); }});
